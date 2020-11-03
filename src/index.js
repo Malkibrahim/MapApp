@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import WebMapView from "./App";
-
 ReactDOM.render(
   <React.StrictMode>
     <WebMapView />
