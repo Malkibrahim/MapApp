@@ -7,20 +7,15 @@ export class WebMapView extends React.Component {
     super(props);
     this.mapRef = React.createRef();
 
-    this.state = {index:-1,location:{}}
+    // this.state = {index:-1,location:{}}
   }
-<<<<<<< HEAD
-
-
-  loadMap = () => {
-
-
-=======
   state = {
     data: items,
     govs: governorate,
     currentGov: null,
     curentLocation: null,
+    index:-1,
+    location:{}
   };
   handleChange = (e) => {
     console.log("hiii");
@@ -42,7 +37,6 @@ export class WebMapView extends React.Component {
     this.loadMap();
   };
   loadMap = () => {
->>>>>>> 9db55561cab3cf7907e961748a6adc73267ac455
     loadModules(
       [
         "esri/Map",
@@ -68,11 +62,7 @@ export class WebMapView extends React.Component {
       console.log(this.mapRef.current);
       var graphicsLayer = new GraphicsLayer();
       map.add(graphicsLayer);
-<<<<<<< HEAD
-      items.map((i,index) => {
-=======
-      this.state.data.map((i) => {
->>>>>>> 9db55561cab3cf7907e961748a6adc73267ac455
+      this.state.data.map((i,index) => {
         var point = {
           type: "point",
           longitude: i.y_coordinate,
@@ -126,36 +116,12 @@ export class WebMapView extends React.Component {
           symbol: simpleMarkerSymbol,
           attributes: attributes,
           popupTemplate: popupTemplate,
-          index:index,
+          // index:index,
           
           
         });
 
         graphicsLayer.add(pointGraphic);
-<<<<<<< HEAD
-        });
-
-      });
-  }
-  componentDidMount() {
-    // lazy load the required ArcGIS API for JavaScript modules and CSS
-
-    // navigator.geolocation.getCurrentPosition((position) =>{
-
-    //   if(position !== undefined)
-    //   {
-    //     console.log("Latitude is :", position.coords.latitude);
-    //     console.log("Longitude is :", position.coords.longitude);
-    //     this.setState({location:{lat:position.coords.latitude,long: position.coords.longitude}})
-    //   }
-      
-    // });
- 
-
-    this.loadMap()
-    
-   
-=======
       });
       var polygon = {
         type: "polygon",
@@ -190,7 +156,6 @@ export class WebMapView extends React.Component {
   };
   componentDidMount() {
     this.loadMap();
->>>>>>> 9db55561cab3cf7907e961748a6adc73267ac455
   }
   componentDidUpdate() {}
 
@@ -207,9 +172,6 @@ export class WebMapView extends React.Component {
 
     // this.loadMap()
     return (
-<<<<<<< HEAD
-      <div className="webmap" style={{ height: 1000 }} ref={this.mapRef}/>
-=======
       <div>
         <select
           value={this.state.currentGov}
@@ -222,7 +184,6 @@ export class WebMapView extends React.Component {
 
         <div className="webmap" style={{ height: 1000 }} ref={this.mapRef} />
       </div>
->>>>>>> 9db55561cab3cf7907e961748a6adc73267ac455
     );
   }
 }
