@@ -1,6 +1,7 @@
 import React from "react";
 import { loadModules } from "esri-loader";
 import { items } from "./fakeServer";
+import { governorate } from "./governorate";
 export class WebMapView extends React.Component {
   constructor(props) {
     super(props);
@@ -8,11 +9,40 @@ export class WebMapView extends React.Component {
 
     this.state = {index:-1,location:{}}
   }
+<<<<<<< HEAD
 
 
   loadMap = () => {
 
 
+=======
+  state = {
+    data: items,
+    govs: governorate,
+    currentGov: null,
+    curentLocation: null,
+  };
+  handleChange = (e) => {
+    console.log("hiii");
+    const currentGov = e.target.value;
+    this.setState({ currentGov }, () => {
+      console.log(this.state.currentGov);
+    });
+    // console.log(e.target.value);
+    debugger;
+    const govDetail = this.state.govs.find((g) => g.en_name == currentGov);
+    const location = govDetail.location;
+    this.setState({ curentLocation: location });
+
+    console.log(this.state.curentLocation);
+    if (this.state.curentLocation !== null) {
+      console.log(this.state.curentLocation.lat);
+      console.log(this.state.curentLocation.long);
+    }
+    this.loadMap();
+  };
+  loadMap = () => {
+>>>>>>> 9db55561cab3cf7907e961748a6adc73267ac455
     loadModules(
       [
         "esri/Map",
@@ -29,12 +59,20 @@ export class WebMapView extends React.Component {
       this.view = new MapView({
         container: this.mapRef.current,
         map: map,
-        center: [30.0282734, 31.2105881],
+        center:
+          this.state.curentLocation == null
+            ? [29.9187387, 31.2000924]
+            : [this.state.curentLocation.lat, this.state.curentLocation.long],
         zoom: 13,
       });
+      console.log(this.mapRef.current);
       var graphicsLayer = new GraphicsLayer();
       map.add(graphicsLayer);
+<<<<<<< HEAD
       items.map((i,index) => {
+=======
+      this.state.data.map((i) => {
+>>>>>>> 9db55561cab3cf7907e961748a6adc73267ac455
         var point = {
           type: "point",
           longitude: i.y_coordinate,
@@ -94,6 +132,7 @@ export class WebMapView extends React.Component {
         });
 
         graphicsLayer.add(pointGraphic);
+<<<<<<< HEAD
         });
 
       });
@@ -116,7 +155,44 @@ export class WebMapView extends React.Component {
     this.loadMap()
     
    
+=======
+      });
+      var polygon = {
+        type: "polygon",
+        rings: [
+          [30.0228069, 31.2142028],
+          [30.029507, 31.212698],
+          [30.0281133, 31.2106249],
+          [30.0236394, 31.2073342],
+          [30.0209446, 31.2057394],
+          [30.0175873, 31.2050287],
+        ],
+      };
+
+      var simpleFillSymbol = {
+        type: "simple-fill",
+        color: "#aa3a3a",
+
+        outline: {
+          color: "#aa3a3a",
+          width: 1,
+        },
+        style: "backward-diagonal",
+      };
+
+      var polygonGraphic = new Graphic({
+        geometry: polygon,
+        symbol: simpleFillSymbol,
+      });
+
+      graphicsLayer.add(polygonGraphic);
+    });
+  };
+  componentDidMount() {
+    this.loadMap();
+>>>>>>> 9db55561cab3cf7907e961748a6adc73267ac455
   }
+  componentDidUpdate() {}
 
   componentWillUnmount() {
     if (this.view) {
@@ -131,7 +207,22 @@ export class WebMapView extends React.Component {
 
     // this.loadMap()
     return (
+<<<<<<< HEAD
       <div className="webmap" style={{ height: 1000 }} ref={this.mapRef}/>
+=======
+      <div>
+        <select
+          value={this.state.currentGov}
+          onChange={(e) => this.handleChange(e)}
+        >
+          {this.state.govs.map((i) => {
+            return <option>{i.en_name}</option>;
+          })}
+        </select>
+
+        <div className="webmap" style={{ height: 1000 }} ref={this.mapRef} />
+      </div>
+>>>>>>> 9db55561cab3cf7907e961748a6adc73267ac455
     );
   }
 }
