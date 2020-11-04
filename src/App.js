@@ -1,14 +1,38 @@
 import React from "react";
 import { loadModules } from "esri-loader";
 import { items } from "./fakeServer";
+import { governorate } from "./governorate";
 export class WebMapView extends React.Component {
   constructor(props) {
     super(props);
     this.mapRef = React.createRef();
   }
+  state = {
+    data: items,
+    govs: governorate,
+    currentGov: null,
+    curentLocation: null,
+  };
+  handleChange = (e) => {
+    console.log("hiii");
+    const currentGov = e.target.value;
+    this.setState({ currentGov }, () => {
+      console.log(this.state.currentGov);
+    });
+    // console.log(e.target.value);
+    debugger;
+    const govDetail = this.state.govs.find((g) => g.en_name == currentGov);
+    const location = govDetail.location;
+    this.setState({ curentLocation: location });
 
-  componentDidMount() {
-    // lazy load the required ArcGIS API for JavaScript modules and CSS
+    console.log(this.state.curentLocation);
+    if (this.state.curentLocation !== null) {
+      console.log(this.state.curentLocation.lat);
+      console.log(this.state.curentLocation.long);
+    }
+    this.loadMap();
+  };
+  loadMap = () => {
     loadModules(
       [
         "esri/Map",
@@ -25,12 +49,16 @@ export class WebMapView extends React.Component {
       this.view = new MapView({
         container: this.mapRef.current,
         map: map,
-        center: [30.0282734, 31.2105881],
+        center:
+          this.state.curentLocation == null
+            ? [29.9187387, 31.2000924]
+            : [this.state.curentLocation.lat, this.state.curentLocation.long],
         zoom: 13,
       });
+      console.log(this.mapRef.current);
       var graphicsLayer = new GraphicsLayer();
       map.add(graphicsLayer);
-      items.map((i) => {
+      this.state.data.map((i) => {
         var point = {
           type: "point",
           longitude: i.y_coordinate,
@@ -74,175 +102,43 @@ export class WebMapView extends React.Component {
           popupTemplate: popupTemplate,
         });
 
-        // var pointGraphic = new Graphic({
-        //   geometry: point,
-        //   symbol: simpleMarkerSymbol,
-        // });
-
         graphicsLayer.add(pointGraphic);
       });
+      var polygon = {
+        type: "polygon",
+        rings: [
+          [30.0228069, 31.2142028],
+          [30.029507, 31.212698],
+          [30.0281133, 31.2106249],
+          [30.0236394, 31.2073342],
+          [30.0209446, 31.2057394],
+          [30.0175873, 31.2050287],
+        ],
+      };
 
-      // var simpleLineSymbol = {
-      //   //*** UPDATE ***//
-      //   color: [255,0,0],
-      //   width: 2,
-      //   //*** ADD ***//
-      //   style: "dash"
-      // };
+      var simpleFillSymbol = {
+        type: "simple-fill",
+        color: "#aa3a3a",
 
-      // var polyline = {
-      //   type: "polyline",
-      //   paths: [
-      //     [31.2105881, 30.0282734],
-      //     [31.2409168, 29.9863887],
-      //     [31.210583, 30.0282015],
-      //   ],
-      // };
+        outline: {
+          color: "#aa3a3a",
+          width: 1,
+        },
+        style: "backward-diagonal",
+      };
 
-      // var polylineGraphic = new Graphic({
-      //   geometry: polyline,
-      //   symbol: simpleLineSymbol,
-      // });
+      var polygonGraphic = new Graphic({
+        geometry: polygon,
+        symbol: simpleFillSymbol,
+      });
 
-      // graphicsLayer.add(polylineGraphic);
-      // var polygon = {
-      //   type: "polygon",
-      //   rings: [
-      //     [31.2105881, 30.0282734],
-      //     [31.2409168, 29.9863887],
-      //     [31.210583, 30.0282015],
-      //   ],
-      // };
-
-      // var simpleFillSymbol = {
-      //   // *** UPDATE ***//
-      //   color: [50,100,255,.5],
-      //   outline: {
-      //     color: [50, 100, 255],
-      //     width: 1
-      //   },
-      //   //*** ADD ***//
-      //   style: "backward-diagonal"
-      // };
-
-      // var polygonGraphic = new Graphic({
-      //   geometry: polygon,
-      //   symbol: simpleFillSymbol,
-      // });
-
-      // graphicsLayer.add(polygonGraphic);
-      //
-      // var trailheadsRenderer = {
-      //   type: "simple",
-      //   symbol: {
-      //     type: "picture-marker",
-      //     url:
-      //       "http://static.arcgis.com/images/Symbols/NPS/npsPictograph_0231b.png",
-      //     width: "18px",
-      //     height: "18px",
-      //   },
-      // };
-      // var trailheadsLabels = {
-      //   symbol: {
-      //     type: "text",
-      //     color: "#FFFFFF",
-      //     haloColor: "#5E8D74",
-      //     haloSize: "2px",
-      //     font: {
-      //       size: "12px",
-      //       family: "Noto Sans",
-      //       style: "italic",
-      //       weight: "normal",
-      //     },
-      //   },
-      //   labelPlacement: "above-center",
-      //   labelExpressionInfo: {
-      //     expression: `${items[0].governorate_code}`,
-      //   },
-      // };
-      // var trailheads = new FeatureLayer({
-      //   url:
-      //     "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0",
-      //   renderer: trailheadsRenderer,
-      //   labelingInfo: [trailheadsLabels],
-      // });
-      // var trailsRenderer = {
-      //   type: "simple",
-      //   symbol: {
-      //     color: "#BA55D3",
-      //     type: "simple-line",
-      //     style: "solid",
-      //   },
-      //   visualVariables: [
-      //     {
-      //       type: "size",
-      //       field: "ELEV_GAIN",
-      //       minDataValue: 0,
-      //       maxDataValue: 2300,
-      //       minSize: "3px",
-      //       maxSize: "7px",
-      //     },
-      //   ],
-      // };
-      // var trails = new FeatureLayer({
-      //   url:
-      //     "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
-      //   renderer: trailsRenderer,
-      //   opacity: 0.75,
-      // });
-      // var bikeTrailsRenderer = {
-      //   type: "simple",
-      //   symbol: {
-      //     type: "simple-line",
-      //     style: "short-dot",
-      //     color: "#FF91FF",
-      //     width: "1px",
-      //   },
-      // };
-      // var bikeTrails = new FeatureLayer({
-      //   url:
-      //     "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
-      //   renderer: bikeTrailsRenderer,
-      //   definitionExpression: "USE_BIKE = 'YES'",
-      // });
-
-      // map.add(trails, 0);
-      // map.add(trailheads);
-      // map.add(bikeTrails, 1);
-      // function createFillSymbol(value, color) {
-      //   return {
-      //     value: value,
-      //     symbol: {
-      //       color: color,
-      //       type: "simple-fill",
-      //       style: "solid",
-      //       outline: {
-      //         style: "none",
-      //       },
-      //     },
-      //     label: value,
-      //   };
-      // }
-
-      // var openSpacesRenderer = {
-      //   type: "unique-value",
-      //   field: "TYPE",
-      //   uniqueValueInfos: [
-      //     createFillSymbol("Natural Areas", "#9E559C"),
-      //     createFillSymbol("Regional Open Space", "#A7C636"),
-      //     createFillSymbol("Local Park", "#149ECE"),
-      //     createFillSymbol("Regional Recreation Park", "#ED5151"),
-      //   ],
-      // };
-      // var openspaces = new FeatureLayer({
-      //   url:
-      //     "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space/FeatureServer/0",
-      //   renderer: openSpacesRenderer,
-      //   opacity: 0.2,
-      // });
-      // map.add(openspaces, 0);
+      graphicsLayer.add(polygonGraphic);
     });
+  };
+  componentDidMount() {
+    this.loadMap();
   }
+  componentDidUpdate() {}
 
   componentWillUnmount() {
     if (this.view) {
@@ -253,7 +149,18 @@ export class WebMapView extends React.Component {
 
   render() {
     return (
-      <div className="webmap" style={{ height: 1000 }} ref={this.mapRef} />
+      <div>
+        <select
+          value={this.state.currentGov}
+          onChange={(e) => this.handleChange(e)}
+        >
+          {this.state.govs.map((i) => {
+            return <option>{i.en_name}</option>;
+          })}
+        </select>
+
+        <div className="webmap" style={{ height: 1000 }} ref={this.mapRef} />
+      </div>
     );
   }
 }
