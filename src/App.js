@@ -2,7 +2,6 @@ import React from "react";
 import { loadModules } from "esri-loader";
 import { items } from "./fakeServer";
 import { governorate } from "./governorate";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export class WebMapView extends React.Component {
   constructor(props) {
     super(props);
@@ -168,24 +167,7 @@ export class WebMapView extends React.Component {
   componentDidMount() {
     this.loadMap();
   }
-  componentDidUpdate() {
-    this.view.on("click", function (event) {
-      // you must overwrite default click-for-popup
-      // behavior to display your own popup
-      this.view.popup.autoOpenEnabled = false;
-
-      // Get the coordinates of the click on the view
-      var lat = Math.round(event.mapPoint.latitude * 1000) / 1000;
-      var lon = Math.round(event.mapPoint.longitude * 1000) / 1000;
-      console.log("beeeeeeeb");
-      this.view.popup.open({
-        // Set the popup's title to the coordinates of the location
-        title: "Reverse geocode: [" + lon + ", " + lat + "]",
-        location: event.mapPoint, // Set the location of the popup to the clicked location
-        // content: "This is a point of interest"  // content displayed in the popup
-      });
-    });
-  }
+  
 
   componentWillUnmount() {
     if (this.view) {
@@ -222,7 +204,27 @@ export class WebMapView extends React.Component {
         >
           <i class="fas fa-map-marker-alt fa-2x"></i>
         </button>
-        <div className="webmap" style={{ height: 1000 }} ref={this.mapRef} />
+        <div style={{display:"flex"}}>
+
+           <div className="webmap" style={{ height: 1000 , width:"80%"}} ref={this.mapRef} />
+           <div style={{display:"flex",flexDirection:"column",padding:10}}>
+
+             {
+              this.state.index !== -1 &&
+              Object.keys(this.state.data[this.state.index]).map(key=>{
+
+                return(
+                  <view>
+                    <view>{key + "  :  "}</view>
+                    <view>{this.state.data[this.state.index][key]}</view>
+                  </view>
+                )
+              })
+             }
+
+           </div>
+
+        </div>
       </div>
     );
   }
