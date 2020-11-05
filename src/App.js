@@ -14,8 +14,8 @@ export class WebMapView extends React.Component {
     govs: governorate,
     currentGov: null,
     curentLocation: null,
-    index:-1,
-    location:{}
+    index: -1,
+    location: {},
   };
   handleChange = (e) => {
     console.log("hiii");
@@ -62,12 +62,11 @@ export class WebMapView extends React.Component {
       console.log(this.mapRef.current);
       var graphicsLayer = new GraphicsLayer();
       map.add(graphicsLayer);
-      this.state.data.map((i,index) => {
+      this.state.data.map((i, index) => {
         var point = {
           type: "point",
           longitude: i.y_coordinate,
           latitude: i.x_coordinate,
-          
         };
         if (i.y_coordinate <= 30) {
           var simpleMarkerSymbol = {
@@ -95,21 +94,18 @@ export class WebMapView extends React.Component {
         var attributes = {
           Name: "" + "governorate code : " + i.governorate_code + "",
           Location: " Point Dume State Beach",
-
         };
 
         const getInfo = (feature) => {
-
-          this.setState({index})
-          let content =  "" + "merchant code : " + i.damen_merchant_code + ""
-          return content
-        }
+          this.setState({ index });
+          let content = "" + "merchant code : " + i.damen_merchant_code + "";
+          return content;
+        };
         var popupTemplate = {
           title: "{Name}",
           // content: "" + "merchant code : " + i.damen_merchant_code + "",
-          content:getInfo
+          content: getInfo,
         };
-
 
         var pointGraphic = new Graphic({
           geometry: point,
@@ -117,8 +113,6 @@ export class WebMapView extends React.Component {
           attributes: attributes,
           popupTemplate: popupTemplate,
           // index:index,
-          
-          
         });
 
         graphicsLayer.add(pointGraphic);
@@ -154,10 +148,28 @@ export class WebMapView extends React.Component {
       graphicsLayer.add(polygonGraphic);
     });
   };
+
   componentDidMount() {
     this.loadMap();
   }
-  componentDidUpdate() {}
+  componentDidUpdate() {
+    this.view.on("click", function (event) {
+      // you must overwrite default click-for-popup
+      // behavior to display your own popup
+      this.view.popup.autoOpenEnabled = false;
+
+      // Get the coordinates of the click on the view
+      var lat = Math.round(event.mapPoint.latitude * 1000) / 1000;
+      var lon = Math.round(event.mapPoint.longitude * 1000) / 1000;
+      console.log("beeeeeeeb");
+      this.view.popup.open({
+        // Set the popup's title to the coordinates of the location
+        title: "Reverse geocode: [" + lon + ", " + lat + "]",
+        location: event.mapPoint, // Set the location of the popup to the clicked location
+        // content: "This is a point of interest"  // content displayed in the popup
+      });
+    });
+  }
 
   componentWillUnmount() {
     if (this.view) {
@@ -167,8 +179,7 @@ export class WebMapView extends React.Component {
   }
 
   render() {
-
-    console.log("indexxxxxxxxx",this.state.index)
+    console.log("indexxxxxxxxx", this.state.index);
 
     // this.loadMap()
     return (
