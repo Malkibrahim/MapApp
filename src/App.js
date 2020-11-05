@@ -155,6 +155,16 @@ export class WebMapView extends React.Component {
     });
   };
   componentDidMount() {
+
+    navigator.geolocation.getCurrentPosition(position=>{
+
+      if(position !== undefined)
+      {
+        this.setState({location:{lat:position.coords.latitude,long:position.coords.longitude}})
+      }
+      console.log("lat",position.coords.latitude)
+      console.log("long",position.coords.longitude)
+    })
     this.loadMap();
   }
   componentDidUpdate() {}
@@ -182,7 +192,22 @@ export class WebMapView extends React.Component {
           })}
         </select>
 
-        <div className="webmap" style={{ height: 1000 }} ref={this.mapRef} />
+        <div style={{display:"flex",flex:1}}>
+          <div className="webmap" style={{ height: 1000 ,width:"80%"}} ref={this.mapRef} />
+          <div style={{flexDirection:"column"}}>
+          {
+            this.state.index !== -1 && 
+            Object.keys(this.state.data[this.state.index]).map(key=>(
+
+              <div style={{display:"flex",flexDirection:"row"}}>
+
+                <div>{key + " :  "}</div>
+                <div>{this.state.data[this.state.index][key]}</div>
+              </div>
+            ))
+          }
+          </div>
+        </div>
       </div>
     );
   }
