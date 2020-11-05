@@ -2,6 +2,7 @@ import React from "react";
 import { loadModules } from "esri-loader";
 import { items } from "./fakeServer";
 import { governorate } from "./governorate";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export class WebMapView extends React.Component {
   constructor(props) {
     super(props);
@@ -16,25 +17,6 @@ export class WebMapView extends React.Component {
     curentLocation: null,
     index: -1,
     location: {},
-  };
-  handleChange = (e) => {
-    console.log("hiii");
-    const currentGov = e.target.value;
-    this.setState({ currentGov }, () => {
-      console.log(this.state.currentGov);
-    });
-    // console.log(e.target.value);
-    debugger;
-    const govDetail = this.state.govs.find((g) => g.en_name == currentGov);
-    const location = govDetail.location;
-    this.setState({ curentLocation: location });
-
-    console.log(this.state.curentLocation);
-    if (this.state.curentLocation !== null) {
-      console.log(this.state.curentLocation.lat);
-      console.log(this.state.curentLocation.long);
-    }
-    this.loadMap();
   };
   loadMap = () => {
     loadModules(
@@ -149,17 +131,41 @@ export class WebMapView extends React.Component {
     });
   };
 
-  componentDidMount() {
+  handleChange = (e) => {
+    console.log("hiii");
+    const currentGov = e.target.value;
+    this.setState({ currentGov }, () => {
+      console.log(this.state.currentGov);
+    });
+    // console.log(e.target.value);
+    debugger;
+    const govDetail = this.state.govs.find((g) => g.en_name == currentGov);
+    const location = govDetail.location;
+    this.setState({ curentLocation: location });
 
-    navigator.geolocation.getCurrentPosition(position=>{
-
-      if(position !== undefined)
-      {
-        this.setState({location:{lat:position.coords.latitude,long:position.coords.longitude}})
+    console.log(this.state.curentLocation);
+    if (this.state.curentLocation !== null) {
+      console.log(this.state.curentLocation.lat);
+      console.log(this.state.curentLocation.long);
+    }
+    this.loadMap();
+  };
+  handleCurrentLoc = () => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      if (position !== undefined) {
+        this.setState({
+          curentLocation: {
+            lat: position.coords.longitude,
+            long: position.coords.latitude,
+          },
+        });
       }
-      console.log("lat",position.coords.latitude)
-      console.log("long",position.coords.longitude)
-    })
+      console.log("lat", position.coords.latitude);
+      console.log("long", position.coords.longitude);
+      this.loadMap();
+    });
+  };
+  componentDidMount() {
     this.loadMap();
   }
   componentDidUpdate() {
@@ -202,23 +208,21 @@ export class WebMapView extends React.Component {
             return <option>{i.en_name}</option>;
           })}
         </select>
-
-        <div style={{display:"flex",flex:1}}>
-          <div className="webmap" style={{ height: 1000 ,width:"80%"}} ref={this.mapRef} />
-          <div style={{flexDirection:"column"}}>
-          {
-            this.state.index !== -1 && 
-            Object.keys(this.state.data[this.state.index]).map(key=>(
-
-              <div style={{display:"flex",flexDirection:"row"}}>
-
-                <div>{key + " :  "}</div>
-                <div>{this.state.data[this.state.index][key]}</div>
-              </div>
-            ))
-          }
-          </div>
-        </div>
+        <button
+          style={{
+            color: "#1f3c88",
+            position: "absolute",
+            bottom: 100,
+            right: 100,
+            width: 50,
+            height: 50,
+            zIndex: 1,
+          }}
+          onClick={() => this.handleCurrentLoc()}
+        >
+          <i class="fas fa-map-marker-alt fa-2x"></i>
+        </button>
+        <div className="webmap" style={{ height: 1000 }} ref={this.mapRef} />
       </div>
     );
   }

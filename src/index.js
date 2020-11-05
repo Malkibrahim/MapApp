@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import WebMapView from "./App";
+import "../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
+
 ReactDOM.render(
   <React.StrictMode>
     <WebMapView />
