@@ -113,13 +113,13 @@ export class WebMapView extends React.Component {
 
       var simpleFillSymbol = {
         type: "simple-fill",
-        color: "#aa3a3a",
+        color: [227, 139, 79, 0.8],
 
         outline: {
-          color: "#aa3a3a",
+          color: [255, 255, 255],
           width: 1,
         },
-        style: "backward-diagonal",
+        // style: "backward-diagonal",
       };
 
       var polygonGraphic = new Graphic({
@@ -166,25 +166,37 @@ export class WebMapView extends React.Component {
     });
   };
   componentDidMount() {
+    // setInterval(() => {
+    //   let new_data = [...this.state.data];
+
+    //   new_data[0] = {
+    //     ...new_data[0],
+    //     x_coordinate: new_data[0].x_coordinate + 30.0,
+    //   };
+
+    //   this.setState({ data: new_data });
+    //   // this.loadMap();
+    // }, 7000);
     this.loadMap();
   }
   componentDidUpdate() {
-    this.view.on("click", function (event) {
-      // you must overwrite default click-for-popup
-      // behavior to display your own popup
-      this.view.popup.autoOpenEnabled = false;
+    this.loadMap();
 
-      // Get the coordinates of the click on the view
-      var lat = Math.round(event.mapPoint.latitude * 1000) / 1000;
-      var lon = Math.round(event.mapPoint.longitude * 1000) / 1000;
-      console.log("beeeeeeeb");
-      this.view.popup.open({
-        // Set the popup's title to the coordinates of the location
-        title: "Reverse geocode: [" + lon + ", " + lat + "]",
-        location: event.mapPoint, // Set the location of the popup to the clicked location
-        // content: "This is a point of interest"  // content displayed in the popup
-      });
-    });
+    // this.view.on("click", function (event) {
+    //   // you must overwrite default click-for-popup
+    //   // behavior to display your own popup
+    //   this.view.popup.autoOpenEnabled = false;
+    //   // Get the coordinates of the click on the view
+    //   var lat = Math.round(event.mapPoint.latitude * 1000) / 1000;
+    //   var lon = Math.round(event.mapPoint.longitude * 1000) / 1000;
+    //   console.log("beeeeeeeb");
+    //   this.view.popup.open({
+    //     // Set the popup's title to the coordinates of the location
+    //     title: "Reverse geocode: [" + lon + ", " + lat + "]",
+    //     location: event.mapPoint, // Set the location of the popup to the clicked location
+    //     // content: "This is a point of interest"  // content displayed in the popup
+    //   });
+    // });
   }
 
   componentWillUnmount() {
