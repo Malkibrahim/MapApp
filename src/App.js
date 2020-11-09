@@ -17,7 +17,7 @@ export class WebMapView extends React.Component {
     govs: governorate,
     currentGov: null,
     curentLocation: null,
-    index: -1,
+    renderedObject:{},
     location: {},
   };
 
@@ -265,7 +265,7 @@ export class WebMapView extends React.Component {
       };
 
       const getInfo = async (feature) => {
-        this.setState({ index });
+        this.setState({ renderedObject:i});
         console.log(this.state.govs[index]);
         const gov_code = { gov_code: this.state.govs[index].gov_code };
     
@@ -275,6 +275,7 @@ export class WebMapView extends React.Component {
       var popupTemplate = {
         title: "{Name}",
         // content: "" + "merchant code : " + i.damen_merchant_code + "",
+        
         content: getInfo,
       };
 
@@ -323,7 +324,7 @@ export class WebMapView extends React.Component {
         };
 
         const getInfo = (feature) => {
-          this.setState({ index });
+          this.setState({ renderedObject:item });
           let content =
             "" + "district_name : " + item.district_name + "";
 
@@ -382,7 +383,7 @@ export class WebMapView extends React.Component {
         };
 
         const getInfo = (feature) => {
-          this.setState({ index });
+          this.setState({ renderedObject:item });
           // let content =
           //   " " + "district_name : " + item.district_name + "";
 
@@ -481,6 +482,26 @@ export class WebMapView extends React.Component {
     }
   }
 
+  drawTable = () => {
+
+    
+    return(
+
+      Object.keys(this.state.renderedObject).map((key) => {
+        if(key !== "location" && key !== "status")
+        {
+          return (
+            <div style={{marginTop:25}}>
+              <span>{key + "  :  "}</span>
+              <span>{this.state.renderedObject[key].toString()}</span>
+            </div>
+          );
+        }
+       
+      })
+    )
+  
+  }
   render() {
     console.log("indexxxxxxxxx", this.state.index);
 
@@ -518,21 +539,13 @@ export class WebMapView extends React.Component {
           <div
             style={{ display: "flex", flexDirection: "column", padding: 10 }}
           >
-            {this.state.index !== -1 &&
-              Object.keys(this.state.data[this.state.index]).map((key) => {
-                return (
-                  <view>
-                    <view>{key + "  :  "}</view>
-                    <view>{this.state.data[this.state.index][key]}</view>
-                  </view>
-                );
-              })}
+            
 
 
-          <div style={{ display: "flex", flexDirection: "column", border:"1px solid grey" }}>
+          <div style={{ display: "flex", flexDirection: "column", border:"1px solid grey",padding:10,width:200}}>
             <div>
               <span>Governorate : </span>
-              <i class="fa fa-caret-up" style={{fontSize:30,paddingTop:10}}></i>
+              <i class="fa fa-caret-up" style={{fontSize:30,position:"relative",top:5}}></i>
             </div>
             <div>
               <span>Sales Representative : </span>
@@ -544,6 +557,14 @@ export class WebMapView extends React.Component {
             </div>
           </div>
 
+          {Object.entries(this.state.renderedObject).length > 0 &&
+
+            this.drawTable()
+          }
+
+          <button onClick={this.loadMap} style={{marginTop:25}}> 
+            Reset Map
+          </button>
 
           </div>
 
