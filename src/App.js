@@ -29,7 +29,7 @@ export class WebMapView extends React.Component {
         "esri/layers/FeatureLayer",
         "esri/Graphic",
         "esri/layers/GraphicsLayer",
-
+        "esri/widgets/CoordinateConversion",
         "esri/widgets/Search",
         "esri/tasks/Locator",
         "esri/Graphic",
@@ -42,7 +42,7 @@ export class WebMapView extends React.Component {
         FeatureLayer,
         Graphic,
         GraphicsLayer,
-
+        CoordinateConversion,
         Search,
         Locator,
       ]) => {
@@ -61,6 +61,35 @@ export class WebMapView extends React.Component {
         console.log(this.mapRef.current);
         var graphicsLayer = new GraphicsLayer();
         map.add(graphicsLayer);
+        /////scrolling zoom in & out
+
+        var coordinateConversionWidget = new CoordinateConversion({
+          view: view,
+        });
+        view.ui.add(coordinateConversionWidget, "bottom-right");
+        // view.ui.add(coordsWidget, "bottom-right");
+        const showCoordinates = (pt) => {
+          var coords =
+            "Lat/Lon " +
+            pt.x.toFixed(3) +
+            " " +
+            pt.y.toFixed(3) +
+            " | Scale 1:" +
+            Math.round(view.scale * 1) / 1 +
+            " | Zoom " +
+            view.zoom;
+          coordinateConversionWidget.innerHTML = coords;
+          // console.log(coordinateConversionWidget);
+          // console.log(pt.x.toFixed(3), pt.y.toFixed(3), view.zoom);
+        };
+        view.watch("stationary", function (isStationary) {
+          showCoordinates(view.center);
+        });
+
+        view.on("pointer-move", function (evt) {
+          showCoordinates(view.toMap({ x: evt.x, y: evt.y }));
+        });
+        /////scrolling zoom in & out
 
         ///////search to place
         var search = new Search({
@@ -235,18 +264,18 @@ export class WebMapView extends React.Component {
               .then((res) => {
                 console.log(res.data);
                 debugger;
-                res.data.map((i, index) => {
+                res.data.map((item, index) => {
                   // debugger;
                   const pointSales = {
                     type: "point",
-                    latitude: i.location.long,
-                    longitude: i.location.lat,
+                    latitude: item.location.lat,
+                    longitude: item.location.long,
                   };
                   console.log("hhhh");
                   const simpleMarkerSymbolSales = {
                     type: "simple-marker",
                     // style: "triangle",
-                    color: "" + i.status + "",
+                    color: "" + item.status + "",
                     outline: {
                       color: [255, 255, 255],
                       width: 2,
@@ -261,7 +290,7 @@ export class WebMapView extends React.Component {
                   const getInfo = (feature) => {
                     this.setState({ index });
                     let content =
-                      "" + "district_name : " + i.district_name + "";
+                      "" + "district_name : " + item.district_name + "";
 
                     return content;
                   };
@@ -276,7 +305,7 @@ export class WebMapView extends React.Component {
                     symbol: simpleMarkerSymbolSales,
                     attributes: attributesSales,
                     popupTemplate: popupTemplateSales,
-                    // index:index,
+                    index: index,
                   });
                   graphicsLayer.add(pointGraphic3);
                 });
@@ -294,99 +323,102 @@ export class WebMapView extends React.Component {
             symbol: simpleMarkerSymbol,
             attributes: attributes,
             popupTemplate: popupTemplate,
-            // index:index,
+            index: index,
           });
 
           graphicsLayer.add(pointGraphic2);
         });
-        this.state.data.map((i, index) => {
-          var point = {
-            type: "point",
-            longitude: i.y_coordinate,
-            latitude: i.x_coordinate,
-          };
-          if (i.y_coordinate <= 30) {
-            var simpleMarkerSymbol = {
-              type: "simple-marker",
-              color: [0, 150, 50],
-              outline: {
-                color: [255, 255, 255],
-                width: 2,
-              },
-              size: 10,
-            };
-          } else if (i.y_coordinate >= 30) {
-            var simpleMarkerSymbol = {
-              type: "simple-marker",
-              // style:"triangle",
-              color: "#aa3a3a",
-              outline: {
-                color: [255, 255, 255],
-                width: 2,
-              },
-              size: 10,
-            };
-          }
-
-          var attributes = {
-            Name: "" + "governorate code : " + i.governorate_code + "",
-            Location: " Point Dume State Beach",
-          };
-
-          const getInfo = (feature) => {
-            this.setState({ index });
-            let content = "" + "merchant code : " + i.damen_merchant_code + "";
-            console.log(this.state.govs[index]);
-            return content;
-          };
-          var popupTemplate = {
-            title: "{Name}",
-            // content: "" + "merchant code : " + i.damen_merchant_code + "",
-            content: getInfo,
-          };
-
-          var pointGraphic = new Graphic({
-            geometry: point,
-            symbol: simpleMarkerSymbol,
-            attributes: attributes,
-            popupTemplate: popupTemplate,
-            // index:index,
-          });
-
-          graphicsLayer.add(pointGraphic);
-        });
-        var polygon = {
-          type: "polygon",
-          rings: [
-            [30.0228069, 31.2142028],
-            [30.029507, 31.212698],
-            [30.0281133, 31.2106249],
-            [30.0236394, 31.2073342],
-            [30.0209446, 31.2057394],
-            [30.0175873, 31.2050287],
-          ],
-        };
-
-        var simpleFillSymbol = {
-          type: "simple-fill",
-          color: [227, 139, 79, 0.8],
-
-          outline: {
-            color: [255, 255, 255],
-            width: 1,
-          },
-          // style: "backward-diagonal",
-        };
-
-        var polygonGraphic = new Graphic({
-          geometry: polygon,
-          symbol: simpleFillSymbol,
-        });
-
-        graphicsLayer.add(polygonGraphic);
       }
     );
   };
+  //       this.state.data.map((i, index) => {
+  //         var point = {
+  //           type: "point",
+  //           longitude: i.y_coordinate,
+  //           latitude: i.x_coordinate,
+  //         };
+  //         if (i.y_coordinate <= 30) {
+  //           var simpleMarkerSymbol = {
+  //             type: "simple-marker",
+  //             color: [0, 150, 50],
+  //             outline: {
+  //               color: [255, 255, 255],
+  //               width: 2,
+  //             },
+  //             size: 10,
+  //           };
+  //         } else if (i.y_coordinate >= 30) {
+  //           var simpleMarkerSymbol = {
+  //             type: "simple-marker",
+  //             // style:"triangle",
+  //             color: "#aa3a3a",
+  //             outline: {
+  //               color: [255, 255, 255],
+  //               width: 2,
+  //             },
+  //             size: 10,
+  //           };
+  //         }
+
+  //         var attributes = {
+  //           Name: "" + "governorate code : " + i.governorate_code + "",
+  //           Location: " Point Dume State Beach",
+  //         };
+
+  //         const getInfo = (feature) => {
+  //           this.setState({ index });
+  //           let content = "" + "merchant code : " + i.damen_merchant_code + "";
+  //           console.log(this.state.govs[index]);
+  //           return content;
+  //         };
+  //         var popupTemplate = {
+  //           title: "{Name}",
+  //           // content: "" + "merchant code : " + i.damen_merchant_code + "",
+  //           content: getInfo,
+  //         };
+
+  //         var pointGraphic = new Graphic({
+  //           geometry: point,
+  //           symbol: simpleMarkerSymbol,
+  //           attributes: attributes,
+  //           popupTemplate: popupTemplate,
+  //           // index:index,
+  //         });
+
+  //         graphicsLayer.add(pointGraphic);
+  //       });
+  //       var polygon = {
+  //         type: "polygon",
+  //         rings: [
+  //           [30.0228069, 31.2142028],
+  //           [30.029507, 31.212698],
+  //           [30.0281133, 31.2106249],
+  //           [30.0236394, 31.2073342],
+  //           [30.0209446, 31.2057394],
+  //           [30.0175873, 31.2050287],
+  //         ],
+  //       };
+
+  //       var simpleFillSymbol = {
+  //         type: "simple-fill",
+  //         color: [227, 139, 79, 0.8],
+
+  //         outline: {
+  //           color: [255, 255, 255],
+  //           width: 1,
+  //         },
+  //         // style: "backward-diagonal",
+  //       };
+
+  //       var polygonGraphic = new Graphic({
+  //         geometry: polygon,
+  //         symbol: simpleFillSymbol,
+  //       });
+
+  //       graphicsLayer.add(polygonGraphic);
+  //     }
+  //   );
+  // };
 
   handleChange = (e) => {
     console.log("hiii");
