@@ -330,16 +330,11 @@ export class WebMapView extends React.Component {
           let content =
             "" + "district_name : " + item.district_name + "";
 
-          // this.getMerchants(Graphic,graphicsLayer,item.rep_code)
-
+          //check if merchants exist 
           
           if(this.state.merchantsGraphics.length > 0)
           {
-            // this.state.merchantsGraphics.map(merch => {
-
-            //   graphicsLayer.removeMany(merch)
-
-            // })
+            //remove existing merchants
             graphicsLayer.removeMany(this.state.merchantsGraphics)
             this.setState({merchantsGraphics:[]})
 
@@ -353,6 +348,7 @@ export class WebMapView extends React.Component {
 
           else
           {
+            //first load merchants
             this.setState({currentSales:item.rep_code})
             this.getMerchants(Graphic,graphicsLayer,item.rep_code)
           }
@@ -436,6 +432,7 @@ export class WebMapView extends React.Component {
           index: index,
         });
 
+        //store merchants graphics
         this.setState({merchantsGraphics:[...this.state.merchantsGraphics,pointGraphic3]})
         graphicsLayer.add(pointGraphic3);
       });
