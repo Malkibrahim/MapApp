@@ -19,6 +19,8 @@ export class WebMapView extends React.Component {
     curentLocation: null,
     renderedObject:{},
     location: {},
+    merchantsGraphics:[],
+    currentSales:""
   };
 
   loadMap = () => {
@@ -328,7 +330,37 @@ export class WebMapView extends React.Component {
           let content =
             "" + "district_name : " + item.district_name + "";
 
-          this.getMerchants(Graphic,graphicsLayer,item.rep_code)
+          // this.getMerchants(Graphic,graphicsLayer,item.rep_code)
+
+          
+          if(this.state.merchantsGraphics.length > 0)
+          {
+            // this.state.merchantsGraphics.map(merch => {
+
+            //   graphicsLayer.removeMany(merch)
+
+            // })
+            graphicsLayer.removeMany(this.state.merchantsGraphics)
+            this.setState({merchantsGraphics:[]})
+
+            if(item.rep_code !== this.state.currentSales)
+            {
+              this.setState({currentSales:item.rep_code})
+              this.getMerchants(Graphic,graphicsLayer,item.rep_code)
+            }
+            
+          }
+
+          else
+          {
+            this.setState({currentSales:item.rep_code})
+            this.getMerchants(Graphic,graphicsLayer,item.rep_code)
+          }
+
+          
+          // console.log("hh",pointGraphic3)
+
+        
           
           return content;
         };
@@ -403,6 +435,8 @@ export class WebMapView extends React.Component {
           popupTemplate: popupTemplateSales,
           index: index,
         });
+
+        this.setState({merchantsGraphics:[...this.state.merchantsGraphics,pointGraphic3]})
         graphicsLayer.add(pointGraphic3);
       });
     });
